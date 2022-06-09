@@ -1,0 +1,18 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy: # Watch the Deployment file
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build: # Watch the Docker file
+  local:
+    push: false
+  artifacts:
+    - image: wahaha007/auth
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts' # include multi level dir
+            dest: .
