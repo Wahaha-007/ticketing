@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
+import { RequestValidationError } from '../errors/request-validation-error';
+import { DatabaseConnectionError } from '../errors/database-connection-error';
 
 const router = express.Router(); // Special Object that contains Routes
 
@@ -22,14 +24,16 @@ router.post(
 
     if (!errors.isEmpty()) {
       // return res.status(400).send(errors.array());
-      throw new Error('Invalid email or password');
+      // throw new Error('Invalid email or password');
+      throw new RequestValidationError(errors.array());
     }
 
     // 3. OK, no error, let's continue
     const { email, password } = req.body;
 
     console.log('Creatinga user...');
-    throw new Error('Error connecting to database');
+    /// throw new Error('Error connecting to database');
+    throw new DatabaseConnectionError();
 
     res.send({});
 
