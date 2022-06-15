@@ -1,13 +1,17 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
+import jwt from 'jsonwebtoken';
+
+import { User } from '../models/user';
 import { RequestValidationError } from '../errors/request-validation-error';
-import { DatabaseConnectionError } from '../errors/database-connection-error';
+import { BadRequestError } from '../errors/bad-request-error';
 
 const router = express.Router(); // Special Object that contains Routes
 
 router.post(
   '/api/users/signup',
   [
+    // 1. Data input verification
     body('email')
       .isEmail()
       // 1.1 Add error msg. to Req. Object
@@ -18,7 +22,7 @@ router.post(
       // 1.2 Add error msg. to Req. Object
       .withMessage('Password must be between 4 and 20 characters.'),
   ],
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     // 2. validationResult will pull out error msg. from Req.
     const errors = validationResult(req);
 
@@ -28,16 +32,39 @@ router.post(
       throw new RequestValidationError(errors.array());
     }
 
-    // 3. OK, no error, let's continue
+    // 3. OK, no invalid input, let's continue Auth Service Workflow
+
+    // 3.1 Check if Email already been used
     const { email, password } = req.body;
 
-    console.log('Creatinga user...');
-    /// throw new Error('Error connecting to database');
-    throw new DatabaseConnectionError();
+    const existingUser = await User.findOne({ email }); // { 'email': email }
 
-    res.send({});
+    if (existingUser) {
+      // console.log('Email in use');
+      // return res.send({});
+      throw new BadRequestError('Email in use');
+    }
 
-    // new User ({ email, password })
+    // 3.2 Save to database
+    const user = User.build({ email, password });
+    await user.save(); // Really save to the database
+
+    // 3.3 Generate JWT
+    const userJwt = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_KEY!
+    );
+
+    // 3.4 Store JWT on the session object
+    // req.session.jwt = userJwt; => Will give and error
+    req.session = {
+      jwt: userJwt,
+    };
+
+    res.status(201).send(user);
   }
 );
 

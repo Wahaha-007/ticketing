@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { Password } from '../services/password';
 
 // --------- 1. In the Typescript World ----------
 // An interface that describes the properties
@@ -22,17 +23,38 @@ interface UserDoc extends mongoose.Document {
   password: string;
 }
 
-// ----------- 2. In the mongoose Wrold -------------
+// ----------- 2. In the mongoose World -------------
 // ( We have no need to dive deeper into Mongo DB world)
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  password: {
-    type: String,
-    required: true,
-  },
+  {
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.password; // Normal Js to delete object property
+        delete ret.__v;
+      },
+    },
+  }
+);
+
+userSchema.pre('save', async function (done) {
+  if (this.isModified('password')) {
+    // will also 'true' for the 1st calling
+    const hashed = await Password.toHash(this.get('password'));
+    this.set('password', hashed);
+  }
+  done();
 });
 
 // -- 3. When 2 worlds meet, mongoose function + typescript gate ---
