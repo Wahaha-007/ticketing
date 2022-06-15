@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 
+import { validateRequest } from '../middlewares/validate-request';
 import { User } from '../models/user';
-import { RequestValidationError } from '../errors/request-validation-error';
 import { BadRequestError } from '../errors/bad-request-error';
 
 const router = express.Router(); // Special Object that contains Routes
@@ -22,18 +22,10 @@ router.post(
       // 1.2 Add error msg. to Req. Object
       .withMessage('Password must be between 4 and 20 characters.'),
   ],
+  // 2. validationResult will pull out error msg. from Req.
+  validateRequest, // Just function definition (name) here not run function
+  // 3. OK, no invalid input, let's continue Auth Service Workflow
   async (req: Request, res: Response) => {
-    // 2. validationResult will pull out error msg. from Req.
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      // return res.status(400).send(errors.array());
-      // throw new Error('Invalid email or password');
-      throw new RequestValidationError(errors.array());
-    }
-
-    // 3. OK, no invalid input, let's continue Auth Service Workflow
-
     // 3.1 Check if Email already been used
     const { email, password } = req.body;
 
