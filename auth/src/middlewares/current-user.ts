@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-// The main function of this middleware is just to extract the data
-// and put into req.currentUser
+// Middleware Function :
+// To extract user data from [jwwt] and put into [req.currentUser]
 
 interface UserPayload {
   id: string;
