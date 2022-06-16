@@ -5,8 +5,15 @@ import { app } from '../app';
 let mongo: any;
 
 beforeAll(async () => {
-  mongo = new MongoMemoryServer();
-  const mongoUri = await mongo.getUri();
+  process.env.JWT_KEY = 'asdf'; // Not the best place but will work for the time being
+
+  // this no longer works
+  // mongo = new MongoMemoryServer();
+  // const mongoUri = await mongo.getUri();
+
+  // it is now
+  mongo = await MongoMemoryServer.create();
+  const mongoUri = mongo.getUri();
 
   await mongoose.connect(mongoUri, {});
   // https://mongoosejs.com/docs/migrating_to_6.html#no-more-deprecation-warning-options
