@@ -30,6 +30,6 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await mongoose.connection.close(); // We should close mongoose before closing mongo
   await mongo.stop();
-  await mongoose.connection.close();
 });
