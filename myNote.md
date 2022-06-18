@@ -7,3 +7,6 @@ Installed Package
 
 2. prepare for TEST
    npm install --save-dev @types/jest @types/supertest jest ts-jest supertest mongodb-memory-server
+
+3. Delete all images start with wahaha007/
+   docker rmi $(docker images wahaha007/\* -q)
