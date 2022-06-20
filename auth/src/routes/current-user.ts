@@ -1,7 +1,5 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
-
-import { currentUser } from '../middlewares/current-user';
+import { currentUser } from '@mmmtickets/common';
 
 const router = express.Router(); // Special Object that contains Routes
 
