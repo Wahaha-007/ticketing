@@ -25,3 +25,12 @@ build: # Watch the Docker file
         manual:
           - src: '**/*.js'
             dest: .
+
+    - image: wahaha007/tickets
+      context: tickets
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts' # include multi level dir
+            dest: .
