@@ -2,7 +2,8 @@ import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
-import { errorHandler, NotFoundError } from '@mmmtickets/common';
+import { errorHandler, NotFoundError, currentUser } from '@mmmtickets/common';
+import { createTicketRouter } from './routes/new';
 
 const app = express();
 app.set('trust proxy', true); // Tell express that we have ingress as a proxy,just trust it !
@@ -17,7 +18,11 @@ app.use(
   })
 );
 
+app.use(currentUser);
+
 // 2.Middleware : Routers
+
+app.use(createTicketRouter);
 
 app.all('*', async (req, res, next) => {
   // next(new NotFoundError());

@@ -2,15 +2,18 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../app';
+import jwt from 'jsonwebtoken';
 
 declare global {
-  var signin: () => Promise<string[]>; // Async function, return promise which resolve to string[]
+  var signin: () => string[]; // Async function, return promise which resolve to string[]
 }
 
 let mongo: any;
 
 beforeAll(async () => {
-  process.env.JWT_KEY = 'asdf'; // Not the best place but will work for the time being
+  // We have no pod here ,must define ENV manually for test
+  // Not the best place but will work for the time being
+  process.env.JWT_KEY = 'asdf';
 
   // this no longer works
   // mongo = new MongoMemoryServer();
@@ -39,19 +42,26 @@ afterAll(async () => {
   await mongo.stop();
 });
 
-global.signin = async () => {
-  const email = 'test@test.com';
-  const password = 'password';
+global.signin = () => {
+  // 1.Build a JWT payload.  { id, email }
+  const payload = {
+    id: '1lk24j124l',
+    email: 'test@test.com',
+  };
 
-  const response = await request(app)
-    .post('/api/users/signup')
-    .send({
-      email,
-      password,
-    })
-    .expect(201);
+  // 2.Create the JWT!
+  const token = jwt.sign(payload, process.env.JWT_KEY!);
 
-  const cookie = response.get('Set-Cookie');
+  // 3.Build session Object. { jwt: MY_JWT }
+  const session = { jwt: token };
 
-  return cookie;
+  // 4.Turn that session into JSON
+  const sessionJSON = JSON.stringify(session);
+
+  // 5.Take JSON and encode it as base64
+  const base64 = Buffer.from(sessionJSON).toString('base64');
+
+  // 6.Return a string thats the cookie with the encoded data
+  // SuperTest needs cookie in array format
+  return [`session=${base64}`];
 };
