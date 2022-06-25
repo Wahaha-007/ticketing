@@ -49,7 +49,7 @@ router.post(
       process.env.JWT_KEY!
     );
 
-    // 3.4 Store JWT on the session object
+    // 3.4 Store JWT on the session object (will be cookie automatically)
     // req.session.jwt = userJwt; => Will give and error
     req.session = {
       jwt: userJwt,
