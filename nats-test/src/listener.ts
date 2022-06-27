@@ -1,4 +1,5 @@
-import nats, { Message } from 'node-nats-streaming';
+import nats from 'node-nats-streaming';
+import { TicketCreatedListener } from './events/ticket-created-listener';
 import { randomBytes } from 'crypto';
 
 console.clear();
@@ -16,29 +17,7 @@ stan.on('connect', () => {
     process.exit();
   });
 
-  const options = stan
-    .subscriptionOptions() //
-    .setManualAckMode(true) // We will set acknowledge by ourself
-    .setDeliverAllAvailable() // Resend all stored message when servcie re-online
-    .setDurableName('accounting-service');
-
-  const subscription = stan.subscribe(
-    'ticket:created',
-    'orders-service-queue-group',
-    options
-  );
-
-  subscription.on('message', (msg: Message) => {
-    // console.log('Message received');
-
-    const data = msg.getData();
-
-    //if (typeof data === 'string') {
-    console.log(`Receiveed event #${msg.getSequence()}, wit data: ${data}`);
-    //}
-
-    msg.ack();
-  });
+  new TicketCreatedListener(stan).listen();
 });
 
 // Graceful Shutdown - Formally 'Close' connection
