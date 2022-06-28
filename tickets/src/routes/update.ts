@@ -7,19 +7,21 @@ import {
   NotAuthorizedError,
 } from '@mmmtickets/common';
 import { Ticket } from '../models/ticket';
+import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
 router.put(
   '/api/tickets/:id',
-  requireAuth,
+  requireAuth, // 1. ----- Authenticate -----
   [
     body('title').not().isEmpty().withMessage('Title is required'),
     body('price')
       .isFloat({ gt: 0 })
       .withMessage('Price must be provided and must be greater than 0'),
   ],
-  validateRequest,
+  validateRequest, // 2. ----- Validate data -----
   async (req: Request, res: Response) => {
     const ticket = await Ticket.findById(req.params.id);
 
@@ -36,7 +38,14 @@ router.put(
       title: req.body.title,
       price: req.body.price,
     });
-    await ticket.save();
+    await ticket.save(); // 3. ----- Save data to database -----
+    // await new TicketUpdatedPublisher(natsWrapper.client).publish({
+    new TicketUpdatedPublisher(natsWrapper.client).publish({
+      id: ticket.id, // 4. ----- Send out Event -----
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId,
+    });
 
     res.send(ticket);
   }

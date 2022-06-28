@@ -1,7 +1,7 @@
 // Here 'subject' = 'channel name'
 export enum Subjects {
   TicketCreated = 'ticket:created',
-  OrderUpdated = 'order:updated',
+  TicketUpdated = 'ticket:updated',
 }
 
 // Example of how to use Enum
