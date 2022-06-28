@@ -1,8 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import { Ticket } from '../../models/ticket';
-
-jest.mock('../../nats-wrapper'); // Tell jest the target fake import file
+import { natsWrapper } from '../../nats-wrapper'; // But will really import the mock version
 
 it('has a route handler listening to /api/tickets for post requests', async () => {
   const response = await request(app).post('/api/tickets').send({});
@@ -77,4 +76,45 @@ it('creates a ticket with valid inputs', async () => {
   tickets = await Ticket.find({});
   expect(tickets.length).toEqual(1);
   expect(tickets[0].price).toEqual(20);
+});
+
+// --------- Added to test publishing ----------- //
+it('publish an event', async () => {
+  await request(app)
+    .post('/api/tickets')
+    .set('Cookie', global.signin())
+    .send({
+      title: 'Valid_Title',
+      price: 20,
+    })
+    .expect(201);
+
+  // console.log(natsWrapper);
+
+  // console.log result
+  //     {
+  //       client: {
+  //         publish: [Function: mockConstructor] {
+  //           _isMockFunction: true,
+  //           getMockImplementation: [Function (anonymous)],
+  //           mock: [Getter/Setter],
+  //           mockClear: [Function (anonymous)],
+  //           mockReset: [Function (anonymous)],
+  //           mockRestore: [Function (anonymous)],
+  //           mockReturnValueOnce: [Function (anonymous)],
+  //           mockResolvedValueOnce: [Function (anonymous)],
+  //           mockRejectedValueOnce: [Function (anonymous)],
+  //           mockReturnValue: [Function (anonymous)],
+  //           mockResolvedValue: [Function (anonymous)],
+  //           mockRejectedValue: [Function (anonymous)],
+  //           mockImplementationOnce: [Function (anonymous)],
+  //           mockImplementation: [Function (anonymous)],
+  //           mockReturnThis: [Function (anonymous)],
+  //           mockName: [Function (anonymous)],
+  //           getMockName: [Function (anonymous)]
+  //         }
+  //       }
+  //     }
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
