@@ -45,10 +45,11 @@ const ticketSchema = new mongoose.Schema(
   }
 );
 
-// -- 3. When 2 worlds meet, mongoose function + typescript gate ---
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
   return new Ticket(attrs);
 };
+
+// -- 3. When 2 worlds meet, mongoose function + typescript gate ---
 
 const Ticket = mongoose.model<TicketDoc, TicketModel>('Ticket', ticketSchema);
 

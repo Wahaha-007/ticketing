@@ -58,14 +58,12 @@ userSchema.pre('save', async function (done) {
   done();
 });
 
-// -- 3. When 2 worlds meet, mongoose function + typescript gate ---
-// 3.1 Writer
 // Pupose of this function is to allow TypeScript to do type checking
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
 };
 
-// 3.2 Reader
+// -- 3. When 2 worlds meet, mongoose function + typescript gate ---
 // Finally create the model for later use (mostly read)
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
