@@ -34,3 +34,12 @@ build: # Watch the Docker file
         manual:
           - src: 'src/**/*.ts' # include multi level dir
             dest: .
+
+    - image: wahaha007/orders
+      context: orders
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts' # include multi level dir
+            dest: .

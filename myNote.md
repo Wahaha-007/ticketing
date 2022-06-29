@@ -13,3 +13,6 @@ Installed Package
 
 4. When move auth/src/errors, auth/src/middlewares to common/src
    npm install @types/cookie-session @types/express @types/jsonwebtoken cookie-session express express-validator jsonwebtoken
+
+5. When copy from tickets and begin orders project
+   npm install
