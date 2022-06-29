@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { OrderStatus } from '@mmmtickets/common';
 import { TicketDoc } from './ticket';
 
+export { OrderStatus }; // Re-export
 // --------- 1. In the Typescript World ----------
 // An interface that describes the properties
 // that are required to createa a new user
