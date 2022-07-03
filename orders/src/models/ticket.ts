@@ -5,6 +5,7 @@ import { Order, OrderStatus } from './order';
 
 // --------- 1. In the Typescript World ----------
 interface TicketAttrs {
+  id: string;
   title: string;
   price: number;
 }
@@ -46,8 +47,21 @@ const ticketSchema = new mongoose.Schema(
 // Attach function to .staticw  = Attach function to Model ( acces to overall collection )
 // Attach function to .methods  = Attach function to Document
 
+// Original Version in Tickets Service :
+
+// ticketSchema.statics.build = (attrs: TicketAttrs) => {
+//   return new Ticket(attrs);
+// };
+
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
-  return new Ticket(attrs);
+  return new Ticket({
+    _id: attrs.id,
+    title: attrs.title,
+    price: attrs.price,
+    // Not so good yb listing one-by-one properties here
+    // If the source Ticket model change in the future, we need to manually change it  here too.
+    // ==> Technical debt
+  });
 };
 
 // Need function keyword here, NOT arrow function

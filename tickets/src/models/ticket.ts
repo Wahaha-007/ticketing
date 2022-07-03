@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // 3.1 For OCC via version control
 
 // When create the project the design flow is also as below
 
@@ -13,6 +14,7 @@ interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
   userId: string;
+  version: number; // 3.3 Add the interface for version control
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -44,6 +46,10 @@ const ticketSchema = new mongoose.Schema(
     },
   }
 );
+
+// --  3.2 Add OCC version control ---- //
+ticketSchema.set('versionKey', 'version');
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
   return new Ticket(attrs);

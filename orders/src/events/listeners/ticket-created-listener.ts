@@ -8,5 +8,15 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
   queueGroupName = queueGroupName; //  Just make another small standard ref.
 
   // We just care for msg.ack(), which we must manually call when we [successfully process] Message
-  onMessage(data: TicketCreatedEvent['data'], msg: Message) {}
+  async onMessage(data: TicketCreatedEvent['data'], msg: Message) {
+    const { id, title, price } = data;
+    const ticket = Ticket.build({
+      id,
+      title,
+      price,
+    });
+    await ticket.save(); // Save data into Orders database, 'ticket' collection [ Redundancy ? ]
+
+    msg.ack();
+  }
 }

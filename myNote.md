@@ -16,3 +16,12 @@ Installed Package
 
 5. When copy from tickets and begin orders project
    npm install
+
+6. To use Optimistic concurrency control plugin for Mongoose v5.0 and higher.
+   npm install mongoose-update-if-current
+
+7. Sometimes there is Error about "Enum xxx not define in @mmmtickets/common" (3 July 2022)
+   -> Check the code by VCS, if no error , this likely due to not update Docker image, especially after module update
+   -> Stop K8s, delete all image
+   -> rebuild specific image with > docker build --no-cache -t wahaha007/xxxx .
+   -> Restart skaffold

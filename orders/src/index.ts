@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
+import { TicketCreatedListener } from './events/listeners/ticket-created-listener';
+import { TicketUpdatedListener } from './events/listeners/ticket-updated-listener';
 
 // 1.2.3 Was moved to app.ts as the part of refactoring for 'Test' preparation
 // 4. Real Working Function
@@ -50,6 +52,10 @@ const start = async () => {
     // Graceful Shutdown - Formally 'Close' connection
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
+
+    // 4.2 (Up layer) Create the listener
+    new TicketCreatedListener(natsWrapper.client).listen();
+    new TicketUpdatedListener(natsWrapper.client).listen();
   } catch (err) {
     console.log(err);
   }
