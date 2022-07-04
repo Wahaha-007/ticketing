@@ -67,6 +67,7 @@ router.post(
     // 3.5 Publish and event saying that the order is created
     new OrderCreatedPublisher(natsWrapper.client).publish({
       id: order.id,
+      version: order.version,
       status: order.status,
       userId: order.userId,
       expiresAt: order.expiresAt.toISOString(), // We manually convert time format by ourself

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Order, OrderStatus } from './order';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // 3.1 For OCC via version control
 
 // When create the project the design flow is also as below
 
@@ -14,11 +15,17 @@ interface TicketAttrs {
 export interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
+  version: number; // 3.3 Add the interface for version control
   isReserved(): Promise<boolean>;
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
   build(attrs: TicketAttrs): TicketDoc;
+  // function to update ticket based on OCC (Version check) concept
+  findByEvent(event: {
+    id: string;
+    version: number;
+  }): Promise<TicketDoc | null>;
 }
 
 // ----------- 2. In the mongoose World -------------
@@ -44,6 +51,10 @@ const ticketSchema = new mongoose.Schema(
   }
 );
 
+// --  3.2 Add OCC version control ---- //
+ticketSchema.set('versionKey', 'version');
+ticketSchema.plugin(updateIfCurrentPlugin);
+
 // Attach function to .staticw  = Attach function to Model ( acces to overall collection )
 // Attach function to .methods  = Attach function to Document
 
@@ -61,6 +72,13 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
     // Not so good yb listing one-by-one properties here
     // If the source Ticket model change in the future, we need to manually change it  here too.
     // ==> Technical debt
+  });
+};
+
+ticketSchema.statics.findByEvent = (event: { id: string; version: number }) => {
+  return Ticket.findOne({
+    _id: event.id,
+    version: event.version - 1,
   });
 };
 
