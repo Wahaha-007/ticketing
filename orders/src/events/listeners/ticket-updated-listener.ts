@@ -21,9 +21,12 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
       throw new Error('Ticket not found');
     }
 
-    const { title, price } = data;
-    ticket.set({ title, price });
+    // console.log('Current Version: ', ticket);
 
+    const { title, price, version } = data;
+    ticket.set({ title, price, version }); // If we don't provide version, the 'library' will write 'old version+1'
+
+    // console.log('Presave Version: ', ticket);
     await ticket.save(); // Save data into Orders database, 'ticket' collection [ Redundancy ? ]
 
     msg.ack();

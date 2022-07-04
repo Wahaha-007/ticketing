@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Order, OrderStatus } from './order';
-import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // 3.1 For OCC via version control
+// import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // 3.1 For OCC via version control
 
 // When create the project the design flow is also as below
 
@@ -53,10 +53,7 @@ const ticketSchema = new mongoose.Schema(
 
 // --  3.2 Add OCC version control ---- //
 ticketSchema.set('versionKey', 'version');
-ticketSchema.plugin(updateIfCurrentPlugin);
-
-// Attach function to .staticw  = Attach function to Model ( acces to overall collection )
-// Attach function to .methods  = Attach function to Document
+// ticketSchema.plugin(updateIfCurrentPlugin);
 
 // Original Version in Tickets Service :
 
@@ -74,6 +71,18 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
     // ==> Technical debt
   });
 };
+
+// Home made :  function that can replace 'mongoose-update-if-current' ( Work but will not use here )
+// // Using function will have this = document available for us
+// ticketSchema.pre('save', function (done) {
+//   console.log(this.get('version'));
+
+//   this.$where = {
+//     // $Where => Keyword for Update Operation
+//     version: this.get('version') - 1,
+//   };
+//   done();
+// });
 
 ticketSchema.statics.findByEvent = (event: { id: string; version: number }) => {
   return Ticket.findOne({
