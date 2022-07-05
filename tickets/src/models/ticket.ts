@@ -5,6 +5,7 @@ import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // 3.1 For O
 
 // --------- 1. In the Typescript World ----------
 interface TicketAttrs {
+  // Use for 1st time creattion (Build)
   title: string;
   price: number;
   userId: string;
@@ -15,6 +16,7 @@ interface TicketDoc extends mongoose.Document {
   price: number;
   userId: string;
   version: number; // 3.3 Add the interface for version control
+  orderId?: string; // Will be null for 1st time creation, not required
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -35,6 +37,9 @@ const ticketSchema = new mongoose.Schema(
     userId: {
       type: String,
       required: true,
+    },
+    orderId: {
+      type: String, // Will be null for 1st time creation, not required
     },
   },
   {
