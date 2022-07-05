@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { OrderStatus } from '@mmmtickets/common';
 import { TicketDoc } from './ticket';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // 3.1 For OCC via version control
 
 export { OrderStatus }; // Re-export
 // --------- 1. In the Typescript World ----------
@@ -21,7 +22,7 @@ interface OrderDoc extends mongoose.Document {
   status: OrderStatus;
   expiresAt: Date;
   ticket: TicketDoc;
-  version: number;
+  version: number; // 3.3 Add the interface for version control
 }
 
 // An interface that describes the properties of
@@ -63,6 +64,10 @@ const orderSchema = new mongoose.Schema(
     },
   }
 );
+
+// --  3.2 Add OCC version control ---- //
+orderSchema.set('versionKey', 'version');
+orderSchema.plugin(updateIfCurrentPlugin);
 
 // Pupose of this function is to allow TypeScript to do type checking
 orderSchema.statics.build = (attrs: OrderAttrs) => {
