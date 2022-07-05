@@ -6,10 +6,10 @@ import { natsWrapper } from '../../../nats-wrapper';
 import { Ticket } from '../../../models/ticket';
 
 const setup = async () => {
-  // create an instance of the listener
+  // 1. (BODY) Create an instance of the listener
   const listener = new TicketCreatedListener(natsWrapper.client);
 
-  // create a fake data event
+  // 2. (IN-1) Create a fake data event
   const data: TicketCreatedEvent['data'] = {
     version: 0,
     id: new mongoose.Types.ObjectId().toHexString(),
@@ -18,7 +18,7 @@ const setup = async () => {
     userId: new mongoose.Types.ObjectId().toHexString(),
   };
 
-  // create a fake message object
+  // 3. (IN-2) Create a fake message object
   // @ts-ignore
   const msg: Message = {
     ack: jest.fn(), // Mock function
@@ -28,12 +28,13 @@ const setup = async () => {
 };
 
 it('creates and saves a ticket', async () => {
+  // 1, 2, 3 (BODY) (IN-1) (IN-2)
   const { listener, data, msg } = await setup();
 
-  // call the onMessage function with the data object + message object
+  // ===> ( RUN ) === call the onMessage function with the data object + message object
   await listener.onMessage(data, msg);
 
-  // write assertions to make sure a ticket was created!
+  // 4. (OUT) Write assertions to make sure a ticket was created!
   const ticket = await Ticket.findById(data.id);
 
   expect(ticket).toBeDefined();
@@ -42,11 +43,12 @@ it('creates and saves a ticket', async () => {
 });
 
 it('acks the message', async () => {
+  // 1, 2, 3 (BODY) (IN) (IN)
   const { listener, data, msg } = await setup();
 
-  // call the onMessage function with the data object + message object
+  // ===> ( RUN ) ===  call the onMessage function with the data object + message object
   await listener.onMessage(data, msg);
 
-  // write assertions to make sure ack function is called
+  // 4. (OUT) Write assertions to make sure ack function is called
   expect(msg.ack).toHaveBeenCalled();
 });
