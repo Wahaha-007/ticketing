@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import mongoose from 'mongoose';
+import { Ticket } from '../../models/ticket';
 import { natsWrapper } from '../../nats-wrapper'; // But will really import the mock version
 
 it('returns a 404 if the provided id does not exist', async () => {
@@ -125,4 +126,31 @@ it('publish an event', async () => {
     .expect(200);
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
+});
+
+it('rejects update if the ticket is reserved', async () => {
+  // 1. Make new ticket id DB by HTTP request
+  const cookie = global.signin();
+  const response = await request(app)
+    .post('/api/tickets')
+    .set('Cookie', cookie)
+    .send({
+      title: 'Whatever',
+      price: 10,
+    });
+
+  // 2. Directly reserved ticket in DB
+  const ticket = await Ticket.findById(response.body.id);
+  ticket!.set({ orderId: new mongoose.Types.ObjectId().toHexString() });
+  await ticket!.save();
+
+  // 3. Make a request to update (reserved) twicket and expect Error
+  await request(app)
+    .put(`/api/tickets/${response.body.id}`)
+    .set('Cookie', cookie)
+    .send({
+      title: 'New Title',
+      price: 100,
+    })
+    .expect(400);
 });
