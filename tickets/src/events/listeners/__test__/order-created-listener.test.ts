@@ -58,3 +58,23 @@ it('acks the message', async () => {
 
   expect(msg.ack).toHaveBeenCalled();
 });
+
+it('published a ticket updated event', async () => {
+  const { listener, ticket, data, msg } = await setup();
+
+  await listener.onMessage(data, msg);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+
+  // Option 1:
+  // Add // @ts-ignore because Typescript does not know and any fucntion inside mock function
+  // console.log(natsWrapper.client.publish.mock.calls[0][1]); // Show the published data
+  // {"id":"62c5036ca78faedd154555fe","price":99,"title":"concert","userId":"asdf","orderId":"62c5036ca78faedd15455600","version":1} //
+
+  // Option 2:
+  const ticketUpdatedData = JSON.parse(
+    (natsWrapper.client.publish as jest.Mock).mock.calls[0][1]
+  );
+
+  expect(data.id).toEqual(ticketUpdatedData.orderId);
+});
