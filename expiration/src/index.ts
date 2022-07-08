@@ -1,4 +1,5 @@
 import { natsWrapper } from './nats-wrapper';
+import { OrderCreatedListener } from './events/listeners/order-created-listener';
 
 // 1.2.3 Was moved to app.ts as the part of refactoring for 'Test' preparation
 // 4. Real Working Function
@@ -36,6 +37,8 @@ const start = async () => {
     // Graceful Shutdown - Formally 'Close' connection
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
+
+    new OrderCreatedListener(natsWrapper.client).listen();
   } catch (err) {
     console.log(err);
   }

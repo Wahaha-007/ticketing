@@ -39,6 +39,14 @@ afterAll(async () => {
   await mongo.stop();
 });
 
+// -- Up date 7 Jult by auther below
+// afterAll(async () => {
+//   if (mongo) {
+//     await mongo.stop();
+//   }
+//   await mongoose.connection.close();
+// });
+
 global.signin = async () => {
   const email = 'test@test.com';
   const password = 'password';
