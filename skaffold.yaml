@@ -52,3 +52,12 @@ build: # Watch the Docker file
         manual:
           - src: 'src/**/*.ts'
             dest: .
+
+    - image: wahaha007/payments
+      context: payments
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
