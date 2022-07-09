@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-import { OrderStatus } from '@cygnetops/common';
+import { OrderStatus } from '@mmmtickets/common';
 
 interface OrderAttrs {
   id: string; // Must be provide to match original database
