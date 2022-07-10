@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
+import { OrderCreatedListener } from './events/listeners/order-created-listener';
+import { OrderCancelledListener } from './events/listeners/order-cancelled-listener';
 
 // 1.2.3 Was moved to app.ts as the part of refactoring for 'Test' preparation
 // 4. Real Working Function
@@ -52,6 +54,8 @@ const start = async () => {
     process.on('SIGTERM', () => natsWrapper.client.close());
 
     // 4.2 (Up layer) Create the listener
+    new OrderCreatedListener(natsWrapper.client).listen();
+    new OrderCancelledListener(natsWrapper.client).listen();
   } catch (err) {
     console.log(err);
   }
