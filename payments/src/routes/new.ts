@@ -8,6 +8,7 @@ import {
   NotFoundError,
   OrderStatus,
 } from '@mmmtickets/common';
+import { stripe } from '../stripe';
 import { Order } from '../models/order';
 
 const router = express.Router();
@@ -22,6 +23,7 @@ router.post(
 
     const order = await Order.findById(orderId);
 
+    // 1. BAD Case
     if (!order) {
       throw new NotFoundError();
     }
@@ -31,6 +33,14 @@ router.post(
     if (order.status === OrderStatus.Cancelled) {
       throw new BadRequestError('Cannot pay for an cancelled order');
     }
+
+    // 2. GOOD Case
+
+    await stripe.charges.create({
+      currency: 'usd',
+      amount: order.price * 100, // Default unit in cent
+      source: token,
+    });
 
     res.send({ success: true });
   }
