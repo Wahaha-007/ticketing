@@ -10,6 +10,9 @@ declare global {
 
 jest.mock('../nats-wrapper'); // Tell jest the target fake import file
 
+process.env.STRIPE_KEY =
+  'sk_test_51LK1iCKLbfQxp6XC6OXWD41ewFEIcX3u9btsQbB5nNiBJ7NEilYONAjNaILk8RI3je1pUWvZFZcwxIiLWrFaGM9700Va6fOoCM';
+
 let mongo: any;
 
 beforeAll(async () => {
