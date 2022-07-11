@@ -10,6 +10,7 @@ import {
 } from '@mmmtickets/common';
 import { stripe } from '../stripe';
 import { Order } from '../models/order';
+import { Payment } from '../models/payment';
 
 const router = express.Router();
 
@@ -36,11 +37,18 @@ router.post(
 
     // 2. GOOD Case
 
-    await stripe.charges.create({
+    const charge = await stripe.charges.create({
       currency: 'usd',
       amount: order.price * 100, // Default unit in cent
       source: token,
     });
+
+    // Try to write to new dB collection
+    const payment = Payment.build({
+      orderId,
+      stripeId: charge.id,
+    });
+    await payment.save();
 
     res.status(201).send({ success: true });
   }
