@@ -20,6 +20,10 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
       throw new Error('Order not found');
     }
 
+    if (order.status === OrderStatus.Complete) {
+      return msg.ack();
+    }
+
     order.set({
       // Event the order is paid before timeout, it still be marked as cancelled
       status: OrderStatus.Cancelled, // Need to fix this hole later
