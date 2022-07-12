@@ -21,6 +21,7 @@ const NewTicket = () => {
     doRequest();
   };
 
+  // occurs when an object loses focus
   const onBlur = () => {
     const value = parseFloat(price);
 
@@ -53,7 +54,9 @@ const NewTicket = () => {
           />
         </div>
         {errors}
-        <button className="btn btn-primary">Submit</button>
+        <button className="btn btn-primary" style={{ marginTop: '15px' }}>
+          Submit
+        </button>
       </form>
     </div>
   );
