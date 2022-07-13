@@ -5,6 +5,8 @@ import { app } from './app';
 // 4. Real Working Function
 
 const start = async () => {
+  console.log('Starting up...');
+
   // Must do this so that Typescript will not complain
   if (!process.env.JWT_KEY) {
     throw new Error('JWT_KEY must be defined');
