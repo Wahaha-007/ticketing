@@ -1,0 +1,19 @@
+name: deploy-manifests
+
+on:
+  push: # Merge is a type of push 
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Pre-installed with Docker
+    steps:
+      - uses: actions/checkout@v2
+      - uses: digitalocean/action-doctl@v2 # Like DigitalOcean already collab with Github
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save k8s-ticketing # Install and use new context
+      - run: kubectl apply -f infra/k8s
