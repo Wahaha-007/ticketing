@@ -1,0 +1,25 @@
+name: deploy-client
+
+on:
+  push: # Merge is a type of push
+    branches:
+      - main
+    paths:
+      - 'client/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Pre-installed with Docker
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd client && docker build -t wahaha007/client .
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: docker push wahaha007/client
+      - uses: digitalocean/action-doctl@v2 # Like DigitalOcean already collab with Github
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save k8s-ticketing # Install and use new context
+      - run: kubectl rollout restart deployment client-depl
