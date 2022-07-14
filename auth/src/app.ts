@@ -20,7 +20,8 @@ app.use(
   cookieSession({
     signed: false, // No cookie encryption,
     // secure: true, // only use cookie in  HTTPS connection
-    secure: process.env.NODE_ENV !== 'test',
+    // secure: process.env.NODE_ENV !== 'test',
+    secure: false,
   })
 );
 
