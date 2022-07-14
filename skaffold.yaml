@@ -4,6 +4,7 @@ deploy: # Watch the Deployment file
   kubectl:
     manifests:
       - ./infra/k8s/*
+      - ./infra/k8s-dev/*
 build: # Watch the Docker file
   local:
     push: false
