@@ -5,6 +5,8 @@ import { OrderCreatedListener } from './events/listeners/order-created-listener'
 // 4. Real Working Function
 
 const start = async () => {
+  console.log('Starting...');
+
   // -------- ENV Preparing section -------- //
   // ( Must do this for every ENV var to supress Typescript error)
 
